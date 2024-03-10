@@ -1,4 +1,3 @@
-Overview
 This project implements the Paxos consensus algorithm, a distributed algorithm for achieving consensus among a set of processes. It includes components such as acceptors, proposers, learners, and clients, each playing a specific role to achieve consensus in the Paxos protocol.
 
 This is a Python project
