@@ -1,75 +1,79 @@
-These are some basic tests that can be used to check the correctness
-and functionalities of your Paxos implementation. They are not
-comprehensive but should give you enough confidence that your implementation works.
+Distributed algorithms project 2023
 
-= Dependencies =
-You need bash and basic unix tools (grep, sed, etc).
-If you want to run the test with msg losses, you need iptables with sudo access.
+Chukwunonye Agbakuru-Nwogu
 
-Depending on the network interface used, ip multicast might not be
-enabled. You can check using "ifconfig" and checking that the
-"MULTICAST" flag is set. You *might* have to enable it using:
+Overview
+This project implements the Paxos consensus algorithm, a distributed algorithm for achieving consensus among a set of processes. It includes components such as acceptors, proposers, learners, and clients, each playing a specific role to achieve consensus in the Paxos protocol.
 
-    ifconfig IFACE multicast       # IFACE is the name of the interface
+This is a Python project
 
-Using a connected cable/wifi interface will probably not have this problem (e.g. "eth0", "wlan0").
+The initially provided fake-paxos folder was edited in order to create the 'MyPaxos' folder which contains the full implementations of the Paxos project.
 
-= How to run the tests: =
+The MyPaxos folder contains 3 pythons files which are:
+1) paxos.py:
+    Main Paxos implementation.
+    Likely contains logic for acceptors, proposers, learners, and clients.
+    Handles communication, message processing, and network tasks.
+    Launches different processes for each Paxos role.
 
-1) Place the root of your paxos implementation inside this
-directory. For example, if you have the folder:
+2) message.py:
+    Defines the Message class for Paxos messages.
+    Defines attributes like instance, phase, c_rnd, etc.
 
-   ~/paxos-tests/MyPaxos
+3) config.py:
+    Stores configuration settings for Paxos' number of acceptors, loss percentage, and timeout
 
-Your *.sh scripts should be directly inside it
-(e.g. ~/paxos-tests/MyPaxos/acceptor.sh) and should work when called
-from inside the directory itself.
 
-2) Run one of the "run*.sh" from inside THIS folder. When the run
-finishes, run "check_all.sh" to check the output of the run. For
-example:
+Testing the Project:
+To properly test, run the command lines provided below in your terminal
+Replace `x` with the number of values you want to be proposed (e.g., 100, 1000).
+After each test, the command ./check_all.sh
 
-    cd ~/paxos-tests/
-    ./run.sh MyPaxos 100  # each client will submit 100 values
-    # wait for the run to finish
-    ./check_all.sh # check the run
 
-3) After a run ends, run "check_all.sh" to see if everything went OK.
-"Test 3" might FAIL in some cases, but with few proposed values and no message
-loss it should also be OK.
+    - For Test 1:
 
-= Caveats/Tips =
+        ./run.sh MyPaxos x
 
-a) If you are using a "hardcoded" named network interface
-(e.g. "eth0"), you must make it hardcoded inside your bash scripts
-instead (which is then as a parameter to your actual implementation
-for example). I can change the interface name inside the bash scripts.
 
-b) The scripts will try to "kill" your processes (SIGTERM).
-You might need to "flush" the output of your learners to
-make sure values are printed when learned.
 
-c) The output of your "learners" should be ONLY the values learned,
-one per line. Anything else will fail the checks.
+    - For Test 2 (2 Acceptors):
 
-d) The scripts wait some seconds after starting the different
-processes, to be sure there is some time for your implementation to
-"stabilize". If it is not enough, you should explain why and how to
-make it work. There is no reason for it not to work as is though.
+        Before running the line below, The amount of acceptors being run will have to changed to '2' in the `MyPaxos/config.py` file (Line3) so that the change will be implemented by the code.
+          
+        ./run_2acceptor.sh MyPaxos x
 
-e) The scripts wait for around 5 seconds after starting the clients
-for values to be learned. Depending on the amount of values proposed
-and your implementation, it might not be enough. For around 100-1000
-values per client it should be enough time.
 
-f) The "run_loss.sh" script uses a 10% loss probability which you can
-change inside the script. It does it by adding a rule/filter with
-iptables.  It will also remove it using "loss_unset.sh". If kill the
-script for some reason, you might have to call "loss_unset.sh" by
-hand to remove the filter.
 
-g) fake-paxos is a broken implementation that has the "interface" your
-project should follow (bash scripts). You can try and run it using:
+    - For Test 3 (1 Acceptor):
 
-    ./run.sh fake-paxos 100
-    ./check_all.sh
+        Before running the line below, The amount of acceptors being run will have to changed to '1' in the `MyPaxos/config.py` file (Line3) so that the change will be implemented by the code.
+
+        ./run_1acceptor.sh MyPaxos x
+          
+
+
+    - For Test 4 (Message Loss):
+
+        For this test, you can run it using the command below, or any other run file
+        Before running the line above, The loss percentage being run will have to changed in the `MyPaxos/config.py` file (Line4) so that the change will be implemented by the code.
+          
+        ./run_loss.sh MyPaxos x
+          
+
+
+    - For Test 5 (Kill Acceptors):
+        First, run test 1
+          
+        ./run.sh MyPaxos x
+          
+        Then, use the command 'kill -9 ID' to kill an acceptor in another terminal. This command terminates the specified acceptor.
+        The IDs of each acceptor are printed at the start.
+        With the 'kill -9 ID' command, replace the ID with the actual ID of an acceptor.
+        For example, if '-> acceptor 2  id: 18059' is printed, then the kill command will be 'kill -9 18059'
+
+
+
+    - For Test 6 (Learner Catch Up):
+          
+        ./run_catch_up.sh MyPaxos x
+          
